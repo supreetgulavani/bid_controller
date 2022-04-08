@@ -121,42 +121,61 @@ begin
     Unlocked_mode: begin
     	           unique case(Unlocked_state)
                      s_Unlock:      begin
-									case(C_op)
-                                      NoOperation:  Unlocked_nextstate = s_NoOperation;
+									                                    case(C_op)
+                                     NoOperation:  begin
+									                Unlocked_nextstate = s_NoOperation;
+													NextState = Unlocked_mode;
+													end
 	                                  Unlock:       begin
 													if(C_data !== key)
 													  begin
                                                       Unlocked_nextstate = s_UnlockWait;
+													  NextState = Unlocked_mode;
 													  counter = timer;
 													  end
                                                     else
-                                                      Unlocked_nextstate = s_Unlock;													
+													  begin
+                                                      Unlocked_nextstate = s_Unlock;
+													  NextState = Unlocked_mode;
+                                                      end													  
 													end
 	                                  Lock:         begin
 									                Unlocked_nextstate = s_Lock;
+													NextState = locked_mode;
 													key = C_data;
 													end
 	                                  LoadX:        begin
 									                Unlocked_nextstate = s_LoadX;
+													NextState = unlocked_mode;
 													X_value = C_data;
 													end
 	                                  LoadY:        begin
 									                Unlocked_nextstate = s_LoadY;
+													NextState = unlocked_mode;
 													Y_value = C_data;
 													end
 	                                  LoadZ:        begin
 									                Unlocked_nextstate = s_LoadZ;
+													NextState = unlocked_mode;
 													Z_value = C_data;
 													end
 	                                  SetMask:      begin
 									                Unlocked_nextstate = s_Mask;
+													NextState = unlocked_mode;
 													mask = C_data;
-													end	                                  SetTimer:     Unlocked_nextstate = s_Timer;
+													end	                                  
+									  SetTimer:     begin
+									                Unlocked_nextstate = s_Timer;
+													NextState = unlocked_mode;
+													Timer = C_data;
+													end
 	                                  BidCharge:    begin
 									                Unlocked_nextstate = s_BidCharge;
+													NextState = unlocked_mode;
 													bid_cost = C_data;
 													end
                                     endcase
+
                                     end	
                      s_UnlockWait:  begin
 					                if(counter === 0)
