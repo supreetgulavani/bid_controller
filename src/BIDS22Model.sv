@@ -2,7 +2,7 @@ module BIDS22model(clk, reset_n, X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_
   X_ack, X_err, X_balance, X_win, Y_ack, Y_err, Y_balance, Y_win, Z_ack, Z_err, Z_balance, Z_win, ready, err, roundOver, maxBid);
 
 // input ports
-input logic clk, reset_n 
+input logic clk, reset_n;
 input logic [15:0] X_bidAmt, Y_bidAmt, Z_bidAmt;
 input logic X_bid, Y_bid, Z_bid;
 input logic X_retract, Y_retract, Z_retract; 
@@ -34,7 +34,8 @@ logic [3:0] counter;
 logic [31:0] local_key;
 logic [3:0] previous_op;
 logic unlock_flag;
-logic [31:0] tempX_bidcharge, tempY_bidcharge, tempZ_bidcharge, tempX_balance, tempX_totalbid, tempY_balance, tempY_totalbid, tempZ_balance, tempZ_totalbid;
+logic [31:0] temp_maxbid, tempX_bidcharge, tempY_bidcharge, tempZ_bidcharge, tempX_balance, tempX_totalbid, tempY_balance, tempY_totalbid, tempZ_balance, tempZ_totalbid;
+logic [2:0] temp_win;
 
 // FSM states
 enum {Reset_mode, Unlocked_mode, Locked_mode, RoundActive_mode, RoundOver_mode} State, NextState;
@@ -63,7 +64,7 @@ else
 end
 
 // nextstate logic
-always_comb
+always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State)
 begin
 unique case(State)
   Reset_mode:
@@ -126,7 +127,7 @@ unique case(State)
 	  SetTimer:
 	    begin
 		NextState = Unlocked_mode;
-		Timer = C_data;
+		timer = C_data;
 		end
 	  BidCharge:
 	    begin
@@ -221,6 +222,7 @@ unique case(State)
     end
   RoundActive_mode:
     begin
+	NextState = RoundOver_mode;
     if(C_start)
       begin
 	  // X bid or retract
@@ -460,6 +462,7 @@ unique case(State)
     end
   RoundOver_mode:
     begin
+	NextState = RoundOver_mode;
 	temp_win = 3'b000;
     if(tempY_totalbid > tempX_totalbid)
 	  if(tempY_totalbid > tempZ_totalbid)
