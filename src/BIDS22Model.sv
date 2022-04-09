@@ -68,7 +68,7 @@ parameter
  
 
 // reset logic
-always @(posedge clk)
+always @(posedge clk) 
 begin
 if (!reset_n)
 begin
