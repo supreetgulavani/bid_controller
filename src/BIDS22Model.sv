@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////////
+// ECE593 - Fundamentals of Pre-Silicon Validation
+//			Bid Controller
+//
+// Group 16: Supreet Gulavani, Sreeja Boyina
+// Description: A bid controller that enables players X,Y,Z to bid. 
+//				Controller has a Lock, Unlock mode wherein Unlock mode 
+//				the players' initial amounts are loaded to bid. 
+// 				In Lock mode, bidding  begins and every player can decide
+//				if they want to bid or retract or make no bid for a certain round.
+//				Player with maximum balance wins!
+//////////////////////////////////////////////////////////////////////////////////
+
+// module definition
 module BIDS22model(clk, reset_n, X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start,
   X_ack, X_err, X_balance, X_win, Y_ack, Y_err, Y_balance, Y_win, Z_ack, Z_err, Z_balance, Z_win, ready, err, roundOver, maxBid);
 
@@ -51,16 +65,14 @@ parameter
   SetMask = 6,
   SetTimer = 7,
   BidCharge = 8;
-/*
-st State = Reset_mode;
-st NextState = Reset_mode;*/ 
+ 
 
 // reset logic
 always @(posedge clk)
 begin
 if (!reset_n)
 begin
-  $display("reset on");
+  //$display("reset on");
   State <= Reset_mode;
 end
 else
@@ -71,11 +83,11 @@ end
 always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State, reset_n)
 //always_comb
 begin
-$display("Entered always");
+//$display("Entered always");
 unique case(State)
   Reset_mode:
 	begin
-	$display("Entered Reset_mode");
+	//$display("Entered Reset_mode");
     NextState = Unlocked_mode;
     //set register values
     X_value = 0;
@@ -85,6 +97,7 @@ unique case(State)
     timer = 4'b1111;
     key = 0;
     bid_cost = 1;
+
     //set output values
 	{X_ack, Y_ack, Z_ack} = 3'b000;
     {X_err, Y_err, Z_err} = 6'b000000;
@@ -142,14 +155,18 @@ unique case(State)
 		bid_cost = C_data;
 		end
 	endcase
+
 	//output values
 	if(C_start === 1)
-	  err = 3'b011; //cannot assert c_start when unlocked
+		//cannot assert c_start when unlocked
+		err = 3'b011;	
 	else
-	  if(C_op === Unlock)
-	    err = 3'b010; //already unlocked
+		if(C_op === Unlock)
+			//already unlocked
+			err = 3'b010; 
 	  else
-	    err = 3'b000; //no error
+	  	//no error
+	    err = 3'b000; 
 	{X_ack, Y_ack, Z_ack} = 3'b000;
 	if(X_bid)
 	  X_err = 2'b01;
@@ -190,42 +207,49 @@ unique case(State)
     else if(C_op === Unlock)
 	  if(C_data !== key)
 	    begin
-		err = 3'b001; //bad key
-		repeat (timer - 1)
-	      @(posedge clk);
-		NextState = Locked_mode;
+			err = 3'b001; //bad key
+			repeat (timer - 1)
+	      	@(posedge clk);
+			NextState = Locked_mode;
 		end
 	  else
 	    begin
-		NextState = Unlocked_mode;
-		err = 3'b000; //no error
+			NextState = Unlocked_mode;
+			err = 3'b000; //no error
 		end
     else
 	  begin
-      NextState = Locked_mode;
-	  err = 3'b100; //invalid operation
+      	NextState = Locked_mode;
+	  	err = 3'b100; //invalid operation
 	  end
+
 	//output values
     {X_ack, Y_ack, Z_ack} = 3'b000;
     if(X_bid)
-	  X_err = 2'b01; //round inactive
+		//round inactive
+		X_err = 2'b01; 
 	else
-	  X_err = 2'b00; //no error
+		//no error
+		X_err = 2'b00; 
 	if(Y_bid)
-	  Y_err = 2'b01; //round inactive
+		//round inactive
+		Y_err = 2'b01; 
 	else
-	  Y_err = 2'b00; //no error
+		//no error
+		Y_err = 2'b00; 
 	if(Z_bid)
-	  Z_err = 2'b01; //round inactive
+		//round inactive
+		Z_err = 2'b01; 
 	else
-	  Z_err = 2'b00; //no error
-    X_balance = X_value;
-    Y_balance = Y_value;
-    Z_balance = Z_value;
-    {X_win, Y_win, Z_win} = 3'b000;
-    ready = 1'b1;
-    roundOver = 1'b0;
-    maxBid = 0;
+		//no error
+	  	Z_err = 2'b00; 
+    	X_balance = X_value;
+    	Y_balance = Y_value;
+    	Z_balance = Z_value;
+    	{X_win, Y_win, Z_win} = 3'b000;
+    	ready = 1'b1;
+    	roundOver = 1'b0;
+    	maxBid = 0;
     end
   RoundActive_mode:
     begin
