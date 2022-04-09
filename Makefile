@@ -23,7 +23,7 @@ setup:
 		vmap work work
 
 compile:
-		vlog ../bidder.sv
+		vlog $(SRCS)
 		vlog -f tb.f
 
 opt:
