@@ -24,7 +24,6 @@ setup:
 
 compile:
 		vlog $(SRCS)
-		vlog -f tb.f
 
 opt:
 		vopt top -o top_optimized +acc "+cover=sbfec+bidder(rtl)."
