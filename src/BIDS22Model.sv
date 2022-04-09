@@ -51,24 +51,31 @@ parameter
   SetMask = 6,
   SetTimer = 7,
   BidCharge = 8;
+/*
+st State = Reset_mode;
+st NextState = Reset_mode;*/ 
 
 // reset logic
 always @(posedge clk)
 begin
 if (!reset_n)
 begin
+  $display("reset on");
   State <= Reset_mode;
 end
 else
   State <= NextState;
 end
 
-// nextstate logic
-always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State)
+// nextstate and output logic
+always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State, reset_n)
+//always_comb
 begin
+$display("Entered always");
 unique case(State)
   Reset_mode:
 	begin
+	$display("Entered Reset_mode");
     NextState = Unlocked_mode;
     //set register values
     X_value = 0;
