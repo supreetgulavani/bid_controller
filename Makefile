@@ -31,7 +31,7 @@ opt:
 
 build: all 
 
-.PHONY: all clean setup compile sopt info
+.PHONY: all clean setup compile opt info
 
 .DEFAULT_GOAL	:= build
 
