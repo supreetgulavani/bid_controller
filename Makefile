@@ -12,7 +12,7 @@ TARGET		:= bid_controller
 SRC_DIR 	:= src
 BUILD_DIR 	:= work transcript *~ vsim.wlf *.log dgs.dbg dmslogdir
 
-# sources and objects
+# sources 
 SRCS	:= $(wildcard $(SRC_DIR)/*.sv)
 
 # build recipies
@@ -34,10 +34,11 @@ build: all
 .PHONY: all clean setup compile sopt info
 
 .DEFAULT_GOAL	:= build
+
 clean:
 		rm -rf $(BUILD_DIR) $(TARGET)
 		@echo "Cleanup done!"
 
 info:
-	@echo "Application:\t" $(TARGET)
-	@echo "Sources:\t" $(SRCS)
+	@echo "Application:" $(TARGET)
+	@echo "Sources:" $(SRCS)
