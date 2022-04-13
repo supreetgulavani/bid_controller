@@ -80,383 +80,319 @@ else
 end
 
 // nextstate and output logic
-always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State, reset_n)
-//always_comb
-begin
+//always @(X_bidAmt, X_bid, X_retract, Y_bidAmt, Y_bid, Y_retract, Z_bidAmt, Z_bid, Z_retract, C_data, C_op, C_start, State, reset_n)
+always_comb begin
 //$display("Entered always");
-unique case(State)
-  Reset_mode:
-	begin
-	//$display("Entered Reset_mode");
-    NextState = Unlocked_mode;
-    //set register values
-    X_value = 0;
-	Y_value = 0;
-	Z_value = 0;
-    mask = 3'b111;
-    timer = 4'b1111;
-    key = 0;
-    bid_cost = 1;
+	unique case(State)
+  		Reset_mode: begin
+			//$display("Entered Reset_mode");
+    		NextState = Unlocked_mode;
+    		//set register values
+    		X_value = 0;
+			Y_value = 0;
+			Z_value = 0;
+    		mask = 3'b111;
+    		timer = 4'b1111;
+    		key = 0;
+   			bid_cost = 1;
 
-    //set output values
-	{X_ack, Y_ack, Z_ack} = 3'b000;
-    {X_err, Y_err, Z_err} = 6'b000000;
-    {X_balance, Y_balance, Z_balance} = 0;
-    {X_win, Y_win, Z_win} = 3'b000;
-    ready = 1'b0;
-    err = 3'b000;
-    roundOver = 1'b0;
-    maxBid = 0;
-    end
-  Unlocked_mode: 
-    begin
-    case(C_op)
-      NoOperation:
-	    begin
-		NextState = Unlocked_mode;
-        end
-	  Unlock:
-	    begin
-		NextState = Unlocked_mode;
-		end
-	  Lock:
-	    begin
-		NextState = Locked_mode;
-		key = C_data;
-		end
-	  LoadX:        
-	    begin
-        NextState = Unlocked_mode;
-		X_value = C_data;
-		end
-	  LoadY:
-	    begin
-		NextState = Unlocked_mode;
-		Y_value = C_data;
-		end
-	  LoadZ:        
-	    begin
-		NextState = Unlocked_mode;
-		Z_value = C_data;
-		end
-	  SetMask:
-	    begin
-		NextState = Unlocked_mode;
-		mask = C_data;
-		end	                                  
-	  SetTimer:
-	    begin
-		NextState = Unlocked_mode;
-		timer = C_data;
-		end
-	  BidCharge:
-	    begin
-		NextState = Unlocked_mode;
-		bid_cost = C_data;
-		end
-	endcase
+    		//set output values
+			{X_ack, Y_ack, Z_ack} = 3'b000;
+    		{X_err, Y_err, Z_err} = 6'b000000;
+    		{X_balance, Y_balance, Z_balance} = 0;
+    		{X_win, Y_win, Z_win} = 3'b000;
+    		ready = 1'b0;
+    		err = 3'b000;
+    		roundOver = 1'b0;
+    		maxBid = 0;
+    		end
+  		Unlocked_mode: begin
+    		case(C_op)
+      			NoOperation: begin
+					NextState = Unlocked_mode;
+        		end
+	  			Unlock: begin
+					NextState = Unlocked_mode;
+				end
+	  			Lock: begin
+					NextState = Locked_mode;
+					key = C_data;
+				end
+	  			LoadX: begin
+        			NextState = Unlocked_mode;
+					X_value = C_data;
+				end
+	  			LoadY: begin
+					NextState = Unlocked_mode;
+					Y_value = C_data;
+				end
+	  			LoadZ: begin
+					NextState = Unlocked_mode;
+					Z_value = C_data;
+				end
+	  			SetMask: begin
+					NextState = Unlocked_mode;
+					mask = C_data;
+				end	                                  
+	  			SetTimer: begin
+					NextState = Unlocked_mode;
+					timer = C_data;
+				end
+	  			BidCharge: begin
+					NextState = Unlocked_mode;
+					bid_cost = C_data;
+				end
+			endcase
 
-	//output values
-	if(C_start === 1)
-		//cannot assert c_start when unlocked
-		err = 3'b011;	
-	else
-		if(C_op === Unlock)
-			//already unlocked
-			err = 3'b010; 
-	  else
-	  	//no error
-	    err = 3'b000; 
-	{X_ack, Y_ack, Z_ack} = 3'b000;
-	if(X_bid)
-	  X_err = 2'b01;
-	else
-	  X_err = 2'b00;
-	if(Y_bid)
-	  Y_err = 2'b01;
-	else
-	  Y_err = 2'b00;
-	if(Z_bid)
-	  Z_err = 2'b01;
-	else
-	  Z_err = 2'b00;
-    X_balance = X_value;
-    Y_balance = Y_value;
-    Z_balance = Z_value;
-    {X_win, Y_win, Z_win} = 3'b000;
-    ready = 1'b1;
-    roundOver = 1'b0;
-    maxBid = 0;
-	end
-  Locked_mode:
-    begin
-    if(C_start)
-	  begin
-      NextState = RoundActive_mode;
-	  tempX_balance = X_value;
-	  tempY_balance = Y_value;
-	  tempZ_balance = Z_value;
-	  tempX_totalbid = 0;
-	  tempY_totalbid = 0;
-	  tempZ_totalbid = 0;
-	  tempX_bidcharge = 0;
-	  tempY_bidcharge = 0;
-	  tempZ_bidcharge = 0;
-	  err = 3'b000; //no error
-	  end
-    else if(C_op === Unlock)
-	  if(C_data !== key)
-	    begin
-			err = 3'b001; //bad key
-			repeat (timer - 1)
-	      	@(posedge clk);
-			NextState = Locked_mode;
+			//output values
+			if(C_start === 1)
+				//cannot assert c_start when unlocked
+				err = 3'b011;	
+			else if(C_op === Unlock)
+				//already unlocked
+				err = 3'b010; 
+	  		else begin
+	  			//no error
+			    err = 3'b000; 
+				{X_ack, Y_ack, Z_ack} = 3'b000;
+				end
+
+			if(X_bid)	X_err = 2'b01;
+			else		X_err = 2'b00;
+			if(Y_bid)	Y_err = 2'b01;
+			else		Y_err = 2'b00;
+			if(Z_bid)	Z_err = 2'b01;
+			else		Z_err = 2'b00;
+    		X_balance = X_value;
+ 		   	Y_balance = Y_value;
+    		Z_balance = Z_value;
+    		{X_win, Y_win, Z_win} = 3'b000;
+    		ready = 1'b1;
+    		roundOver = 1'b0;
+    		maxBid = 0;
 		end
-	  else
-	    begin
-			NextState = Unlocked_mode;
+  		Locked_mode: begin
+    		if(C_start) begin
+      			NextState = RoundActive_mode;
+	  			tempX_balance = X_value;
+	  			tempY_balance = Y_value;
+	  			tempZ_balance = Z_value;
+	  			tempX_totalbid = 0;
+	  			tempY_totalbid = 0;
+	  			tempZ_totalbid = 0;
+	  			tempX_bidcharge = 0;
+	  			tempY_bidcharge = 0;
+	  			tempZ_bidcharge = 0;
+	  			err = 3'b000; //no error
+	  		end
+    		else if(C_op === Unlock) begin
+	  			if(C_data !== key) begin
+					err = 3'b001; //bad key
+					repeat (timer - 1)
+	      			@(posedge clk);
+					NextState = Locked_mode;
+				end
+	  			else begin
+					NextState = Unlocked_mode;
+					err = 3'b000; //no error
+				end
+			end
+    		else begin
+      			NextState = Locked_mode;
+	  			err = 3'b100; //invalid operation
+	  		end
+
+			// output values
+    		{X_ack, Y_ack, Z_ack} = 3'b000;
+			// if round inactive, errors
+    		if(X_bid) 	X_err = 2'b01; 
+			else		X_err = 2'b00; 
+			if(Y_bid)	Y_err = 2'b01; 
+			else		Y_err = 2'b00; 
+			if(Z_bid)	Z_err = 2'b01; 
+			else begin
+				//no error
+	  			Z_err = 2'b00; 
+    			X_balance = X_value;
+		    	Y_balance = Y_value;
+    			Z_balance = Z_value;
+    			{X_win, Y_win, Z_win} = 3'b000;
+		    	ready = 1'b1;
+    			roundOver = 1'b0;
+    			maxBid = 0;
+			end
+    	end
+  		RoundActive_mode: begin
+			NextState = RoundOver_mode;
+    		if(C_start) begin
+	  			// X bid or retract
+	  			if(X_bid & (!X_retract)) begin
+	    			if(mask[2]) begin
+		  				X_ack = 1'b1;
+		  				X_err = 2'b00; //no error
+		  				tempX_bidcharge = tempX_bidcharge + bid_cost;
+		  				tempX_balance = (tempX_balance - X_bidAmt) - bid_cost;
+		  				tempX_totalbid = X_bidAmt + tempX_totalbid;
+		  			end
+				else begin
+		  			X_ack = 1'b0;
+		  			X_err = 2'b11; //invalid request
+				  	tempX_balance = 0;
+		  			tempX_totalbid = 0;
+          			tempX_bidcharge = 0;		  
+		  		end
+				err = 3'b000; //no error
+				end
+	  		else if((!X_bid) & X_retract) begin
+	    		if(mask[2]) begin
+		  			X_err = 2'b00; 
+		  			tempX_bidcharge = tempX_bidcharge + bid_cost;
+		  			tempX_balance = (tempX_balance + X_bidAmt) - bid_cost;
+		  			tempX_totalbid = tempX_totalbid - X_bidAmt;
+			  	end
+				else begin
+		  			X_err = 2'b11; //invalid request
+		  			tempX_balance = 0;
+		  			tempX_totalbid = 0;
+          			tempX_bidcharge = 0;		  
+		  		end
+				X_ack = 1'b0;
+				err = 3'b000; //no error
+			end
+	  		else begin
+				if(mask[2]) begin
+		  			if(X_bid & X_retract)	err = 3'b100; //invalid operation
+		  			else begin				
+						err = 3'b000; //no error
+		  				X_ack = 1'b0;
+		  				X_err = 2'b00; //no error
+			  			tempX_balance = tempX_balance;
+		  				tempX_totalbid = tempX_totalbid;
+			  			tempX_bidcharge = tempX_bidcharge;
+					end
+	  			end
+				else  begin
+		  			if(X_bid & X_retract) begin
+		    			err = 3'b100; //invalid operation
+						X_err = 2'b11; //invalid request
+					end
+		  			else begin
+		    			err = 3'b000; //no error
+						X_err = 2'b00; //no error
+					end
+		  			X_ack = 1'b0;
+		  			tempX_balance = 0;
+		  			tempX_totalbid = 0;
+		  			tempX_bidcharge = 0;
+		  		end 
+			end
+	  		// Y bid or retract
+	  		if(Y_bid & (!Y_retract)) begin
+			    if(mask[1]) begin
+		  			Y_ack = 1'b1;
+		  			Y_err = 2'b00; //no error
+		  			tempY_bidcharge = tempY_bidcharge + bid_cost;
+		  			tempY_balance = (tempY_balance - Y_bidAmt) - bid_cost;
+					  tempY_totalbid = Y_bidAmt + tempY_totalbid;
+		  		end
+			else begin
+		  		Y_ack = 1'b0;
+		  		Y_err = 2'b11; //invalid request
+				tempY_balance = 0;
+		  		tempY_totalbid = 0;
+          		tempY_bidcharge = 0;	  
+		  	end
 			err = 3'b000; //no error
-		end
-    else
-	  begin
-      	NextState = Locked_mode;
-	  	err = 3'b100; //invalid operation
-	  end
-
-	//output values
-    {X_ack, Y_ack, Z_ack} = 3'b000;
-    if(X_bid)
-		//round inactive
-		X_err = 2'b01; 
-	else
-		//no error
-		X_err = 2'b00; 
-	if(Y_bid)
-		//round inactive
-		Y_err = 2'b01; 
-	else
-		//no error
-		Y_err = 2'b00; 
-	if(Z_bid)
-		//round inactive
-		Z_err = 2'b01; 
-	else
-		//no error
-	  	Z_err = 2'b00; 
-    	X_balance = X_value;
-    	Y_balance = Y_value;
-    	Z_balance = Z_value;
-    	{X_win, Y_win, Z_win} = 3'b000;
-    	ready = 1'b1;
-    	roundOver = 1'b0;
-    	maxBid = 0;
-    end
-  RoundActive_mode:
-    begin
-	NextState = RoundOver_mode;
-    if(C_start)
-      begin
-	  // X bid or retract
-	  if(X_bid & (!X_retract))
-	    begin
-	    if(mask[2])
-	      begin
-		  X_ack = 1'b1;
-		  X_err = 2'b00; //no error
-		  tempX_bidcharge = tempX_bidcharge + bid_cost;
-		  tempX_balance = (tempX_balance - X_bidAmt) - bid_cost;
-		  tempX_totalbid = X_bidAmt + tempX_totalbid;
-		  end
-		else
-		  begin
-		  X_ack = 1'b0;
-		  X_err = 2'b11; //invalid request
-		  tempX_balance = 0;
-		  tempX_totalbid = 0;
-          tempX_bidcharge = 0;		  
-		  end
-		err = 3'b000; //no error
-		end
-	  else if((!X_bid) & X_retract)
-	    begin
-	    if(mask[2])
-	      begin
-		  X_err = 2'b00; //no error
-		  tempX_bidcharge = tempX_bidcharge + bid_cost;
-		  tempX_balance = (tempX_balance + X_bidAmt) - bid_cost;
-		  tempX_totalbid = tempX_totalbid - X_bidAmt;
-		  end
-		else
-		  begin
-		  X_err = 2'b11; //invalid request
-		  tempX_balance = 0;
-		  tempX_totalbid = 0;
-          tempX_bidcharge = 0;		  
-		  end
-		X_ack = 1'b0;
-		err = 3'b000; //no error
-		end
-	  else
-	    begin
-		if(mask[2])
-		  begin
-		  if(X_bid & X_retract)
-		    err = 3'b100; //invalid operation
-		  else
-		    err = 3'b000; //no error
-		  X_ack = 1'b0;
-		  X_err = 2'b00; //no error
-		  tempX_balance = tempX_balance;
-		  tempX_totalbid = tempX_totalbid;
-		  tempX_bidcharge = tempX_bidcharge;
-		  end
-		else 
-		  begin
-		  if(X_bid & X_retract)
-		    begin
-		    err = 3'b100; //invalid operation
-			X_err = 2'b11; //invalid request
 			end
-		  else
-		    begin
-		    err = 3'b000; //no error
-			X_err = 2'b00; //no error
+	  		else if((!Y_bid) & Y_retract) begin
+			    if(mask[1]) begin
+		  			Y_err = 2'b00; //no error
+		  			tempY_bidcharge = tempY_bidcharge + bid_cost;
+		  			tempY_balance = (tempY_balance + Y_bidAmt) - bid_cost;
+		  			tempY_totalbid = tempY_totalbid - Y_bidAmt;
+		  		end
+			else begin
+		  		Y_err = 2'b11; //invalid request
+		  		tempY_balance = 0;
+		  		tempY_totalbid = 0;
+          		tempY_bidcharge = 0;		  
+		  	end
+			Y_ack = 1'b0;
+			err = 3'b000; //no error
 			end
-		  X_ack = 1'b0;
-		  tempX_balance = 0;
-		  tempX_totalbid = 0;
-		  tempX_bidcharge = 0;
-		  end 
-		end
-	  // Y bid or retract
-	  if(Y_bid & (!Y_retract))
-	    begin
-	    if(mask[1])
-	      begin
-		  Y_ack = 1'b1;
-		  Y_err = 2'b00; //no error
-		  tempY_bidcharge = tempY_bidcharge + bid_cost;
-		  tempY_balance = (tempY_balance - Y_bidAmt) - bid_cost;
-		  tempY_totalbid = Y_bidAmt + tempY_totalbid;
-		  end
-		else
-		  begin
-		  Y_ack = 1'b0;
-		  Y_err = 2'b11; //invalid request
-		  tempY_balance = 0;
-		  tempY_totalbid = 0;
-          tempY_bidcharge = 0;	  
-		  end
-		err = 3'b000; //no error
-		end
-	  else if((!Y_bid) & Y_retract)
-	    begin
-	    if(mask[1])
-	      begin
-		  Y_err = 2'b00; //no error
-		  tempY_bidcharge = tempY_bidcharge + bid_cost;
-		  tempY_balance = (tempY_balance + Y_bidAmt) - bid_cost;
-		  tempY_totalbid = tempY_totalbid - Y_bidAmt;
-		  end
-		else
-		  begin
-		  Y_err = 2'b11; //invalid request
-		  tempY_balance = 0;
-		  tempY_totalbid = 0;
-          tempY_bidcharge = 0;		  
-		  end
-		Y_ack = 1'b0;
-		err = 3'b000; //no error
-		end
-	  else
-	    begin
-		if(mask[1])
-		  begin
-		  if(Y_bid & Y_retract)
-		    err = 3'b100; //invalid operation
-		  else
-		    err = 3'b000; //no error
-		  Y_ack = 1'b0;
-		  Y_err = 2'b00; //no error
-		  tempY_balance = tempY_balance;
-		  tempY_totalbid = tempY_totalbid;
-		  tempY_bidcharge = tempY_bidcharge;
-		  end
-		else 
-		  begin
-		  if(Y_bid & Y_retract)
-		    begin
-		    err = 3'b100; //invalid operation
-			Y_err = 2'b11; //invalid request
+	  		else begin
+				if(mask[1]) begin
+		  			if(Y_bid & Y_retract)	err = 3'b100; //invalid operation
+		  			else 					err = 3'b000; //no error
+		  		Y_ack = 1'b0;
+		  		Y_err = 2'b00; //no error
+		  		tempY_balance = tempY_balance;
+		  		tempY_totalbid = tempY_totalbid;
+		  		tempY_bidcharge = tempY_bidcharge;
+		  		end
+				else  begin
+		  			if(Y_bid & Y_retract) begin
+		    			err = 3'b100; //invalid operation
+						Y_err = 2'b11; //invalid request
+					end
+		  			else begin
+		    			err = 3'b000; //no error
+						Y_err = 2'b00; //no error
+					end
+		  			Y_ack = 1'b0;
+		  			tempY_balance = 0;
+		  			tempY_totalbid = 0;
+		  			tempY_bidcharge = 0;
+		  		end 
 			end
-		  else
-		    begin
-		    err = 3'b000; //no error
-			Y_err = 2'b00; //no error
+	  		// Z bid or retract
+	  		if(Z_bid & (!Z_retract)) begin
+	    		if(mask[0]) begin
+		  			Z_ack = 1'b1;
+		  			Z_err = 2'b00; //no error
+		  			tempZ_bidcharge = tempZ_bidcharge + bid_cost;
+		  			tempZ_balance = (tempZ_balance - Z_bidAmt) - bid_cost;
+		  			tempZ_totalbid = Z_bidAmt + tempZ_totalbid;
+			  	end
+				else begin
+		  			Z_ack = 1'b0;
+		  			Z_err = 2'b11; //invalid request
+		  			tempZ_balance = 0;
+		  			tempZ_totalbid = 0;
+		  			tempZ_bidcharge = 0;
+		  		end
+				err = 3'b000; //no error
 			end
-		  Y_ack = 1'b0;
-		  tempY_balance = 0;
-		  tempY_totalbid = 0;
-		  tempY_bidcharge = 0;
-		  end 
-		end
-	  // Z bid or retract
-	  if(Z_bid & (!Z_retract))
-	    begin
-	    if(mask[0])
-	      begin
-		  Z_ack = 1'b1;
-		  Z_err = 2'b00; //no error
-		  tempZ_bidcharge = tempZ_bidcharge + bid_cost;
-		  tempZ_balance = (tempZ_balance - Z_bidAmt) - bid_cost;
-		  tempZ_totalbid = Z_bidAmt + tempZ_totalbid;
-		  end
-		else
-		  begin
-		  Z_ack = 1'b0;
-		  Z_err = 2'b11; //invalid request
-		  tempZ_balance = 0;
-		  tempZ_totalbid = 0;
-		  tempZ_bidcharge = 0;
-		  end
-		err = 3'b000; //no error
-		end
-	  else if((!Z_bid) & Z_retract)
-	    begin
-	    if(mask[0])
-	      begin
-		  Z_err = 2'b00; //no error
-		  tempZ_bidcharge = tempZ_bidcharge + bid_cost;
-		  tempZ_balance = (tempZ_balance + Z_bidAmt) - bid_cost;
-		  tempZ_totalbid = tempZ_totalbid - Z_bidAmt;
-		  end
-		else
-		  begin
-		  Z_err = 2'b11; //invalid request
-		  tempZ_balance = 0;
-		  tempZ_totalbid = 0;
-          tempZ_bidcharge = 0;		  
-		  end
-		Z_ack = 1'b0;
-		err = 3'b000; //no error
-		end
-	  else
-	    begin
-		if(mask[0])
-		  begin
-		  if(Z_bid & Z_retract)
-		    err = 3'b100; //invalid operation
-		  else
-		    err = 3'b000; //no error
-		  Z_ack = 1'b0;
-		  Z_err = 2'b00; //no error
-		  tempZ_balance = tempZ_balance;
-		  tempZ_totalbid = tempZ_totalbid;
-		  tempZ_bidcharge = tempZ_bidcharge;
-		  end
-		else 
-		  begin
-		  if(Z_bid & Z_retract)
+	  		else if((!Z_bid) & Z_retract) begin
+	    		if(mask[0]) begin
+		  			Z_err = 2'b00; //no error
+		  			tempZ_bidcharge = tempZ_bidcharge + bid_cost;
+		  			tempZ_balance = (tempZ_balance + Z_bidAmt) - bid_cost;
+					  tempZ_totalbid = tempZ_totalbid - Z_bidAmt;
+		  		end
+				else begin
+		  			Z_err = 2'b11; //invalid request
+		  			tempZ_balance = 0;
+		  			tempZ_totalbid = 0;
+          			tempZ_bidcharge = 0;		  
+		  		end
+				Z_ack = 1'b0;
+				err = 3'b000; //no error
+			end
+	  		else	begin
+				if(mask[0]) begin
+		  			if(Z_bid & Z_retract)	err = 3'b100; //invalid operation
+		  			else begin
+						err = 3'b000; //no error
+		  				Z_ack = 1'b0;
+		  				Z_err = 2'b00; //no error
+		  				tempZ_balance = tempZ_balance;
+		  				tempZ_totalbid = tempZ_totalbid;
+		  				tempZ_bidcharge = tempZ_bidcharge;
+					end
+				end
+				else begin
+		  			if(Z_bid & Z_retract)
 		    begin
 		    err = 3'b100; //invalid operation
 			Z_err = 2'b11; //invalid request
