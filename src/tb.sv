@@ -1,18 +1,19 @@
-import package rnippkg::*
+import package rnippkg::*;
     
 module top ();
 
 parameter CLK_PERIOD = 10;
 
-logic         clk, reset_n, X_bid, X_retract, Y_bid, Y_retract, Z_bid, Z_retract, C_start,
-logic [15:0]  X_bidAmt, Y_bidAmt, Z_bidAmt,
-logic [31:0]  C_data,
-logic [3:0]   C_op,
-logic        X_ack, X_win, Y_ack, Y_win, Z_ack, Z_win, ready, roundOver,
-logic [1:0]  X_err, Y_err, Z_err,
-logic [31:0] X_balance, Y_balance, Z_balance, maxBid,
+logic         clk, reset_n, X_bid, X_retract, Y_bid, Y_retract, Z_bid, Z_retract, C_start;
+logic [15:0]  X_bidAmt, Y_bidAmt, Z_bidAmt;
+logic [31:0]  C_data;
+logic [3:0]   C_op;
+logic        X_ack, X_win, Y_ack, Y_win, Z_ack, Z_win, ready, roundOver;
+logic [1:0]  X_err, Y_err, Z_err;
+logic [31:0] X_balance, Y_balance, Z_balance, maxBid'
 logic [2:0]  err;
 
+/*
 // internal registers
 logic [31:0] X_value;
 logic [31:0] Y_value;
@@ -24,6 +25,7 @@ logic [31:0] bid_cost;
 
 logic [3:0] counter;
 logic [31:0] local_key;
+*/
 
 real    BIDSIGX, BIDSIGY, BIDSIGZ, RETRACTSIGX, RETRACTSIGY, RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
         STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
