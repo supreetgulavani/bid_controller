@@ -1,4 +1,4 @@
-package rnippkg
+package rnippkg;
 
 // random input
 class bids_gen;
@@ -15,7 +15,7 @@ class bids_gen;
 		//C_op <= 8;
 		C_op inside {[0:8]};
 	};
-/*
+    /*
 	// accept components
 	function bid_ip ();
 		this.X_bidAmt = X_bidAmt;
