@@ -72,6 +72,7 @@ logic [31:0] local_key;
 real    BIDSIGX, BIDSIGY, BIDSIGZ, RETRACTSIGX, RETRACTSIGY, RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
         STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
         BALANCEY, BALANCEZ, BIDMAX, WINX, WINY, WINZ, STATE;
+
 // clock gen
 always begin: clock_generator
  	#(CLK_PERIOD / 2) clk = ~clk;
@@ -165,8 +166,8 @@ covergroup bid_output_signals with function sample(bit X_ack, Y_ack, Z_ack, X_wi
     winY : coverpoint Y_win;
     winZ : coverpoint Z_win;
 endgroup
-/*
-covergroup state_check with function sample(State);
+
+covergroup state_check @(posedge clk);
     option.at_least = 1;
     coverpoint b1.State {
         bins s0 = (Reset_mode => Unlocked_mode);
@@ -187,7 +188,8 @@ covergroup state_check with function sample(State);
         bins s15 = (Timer_mode => Timer_mode);
     }
 endgroup
-*/
+
+state_check sc = new;
 
 // random inputs generation and get_coverage
 initial begin
@@ -211,8 +213,8 @@ initial begin
 	
 	bg.printbid();
 
-    static bid_input_signals bis = new();
-    static bid_output_signals bos = new();
+    static bid_input_signals bis = new;
+    static bid_output_signals bos = new;
    //static state_check sc = new();
     
     // input coverage
@@ -255,8 +257,8 @@ initial begin
     WINY =  bos.winY.get_coverage();
     WINZ =  bos.winZ.get_coverage();
     // state coverage
-    //sc.sample(State);
-    //STATE = sc.b1.State.get_coverage();
+    sc.sample(State);
+    STATE = sc.b1.State.get_coverage();
     end
     while (1);
     /*while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
