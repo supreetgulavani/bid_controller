@@ -28,9 +28,13 @@ compile:
 opt:
 		vopt top -o top_optimized +acc "+cover=sbfec+bidder(rtl)."
 
+report:
+		
+		vsim -cvgperinstance -c <ARGUMENTS> work.tb_top work.glbl -do " coverage save -onexit funcov.ucdb
+		 
 build: all 
 
-.PHONY: all clean setup compile opt info
+.PHONY: all clean setup compile opt report info
 
 .DEFAULT_GOAL	:= build
 
