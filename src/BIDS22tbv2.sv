@@ -1,3 +1,5 @@
+// Code your testbench here
+// or browse Examples
 //import package rnippkg::*;
    
 // random input
@@ -38,7 +40,7 @@ class bids_gen;
 		$display("X_bid:%b\tY_bid:%b\tZ_bid:%b", X_bid, Y_bid, Z_bid); 
 		$display("X_retract:%b\tY_retract:%b\tZ_retract:%b", X_retract, Y_retract, Z_retract); 
 		$display("C_data:%b\tC_start:%b", C_data, C_start); 
-	endfunction : printbid
+	endfunction
 
 endclass
    
@@ -166,7 +168,7 @@ covergroup bid_output_signals with function sample(bit X_ack, Y_ack, Z_ack, X_wi
     winY : coverpoint Y_win;
     winZ : coverpoint Z_win;
 endgroup
-
+/*
 covergroup state_check @(posedge clk);
     option.at_least = 1;
     coverpoint b1.State {
@@ -190,31 +192,33 @@ covergroup state_check @(posedge clk);
 endgroup
 
 state_check sc = new;
-
+*/
 // random inputs generation and get_coverage
+bids_gen bidg = new;
+      bid_input_signals bis = new;
+    bid_output_signals bos = new;
 initial begin
 	$display("Start generating testcases\n");
-	bids_gen bg = new();
+  	
     do begin
-	bg.isopcode.constraint_mode($random);
-	assert(bg.randomize());
-    X_bidAmt = bg.X_bidAmt;
-    Y_bidAmt = bg.Y_bidAmt;
-    Z_bidAmt = bg.Z_bidAmt;
-    X_bid = bg.X_bid;
-    Y_bid = bg.Y_bid;
-    Z_bid = bg.Z_bid;
-	X_retract = bg.X_retract;
-    Y_retract = bg.Y_retract;
-    Z_retract = bg.Z_retract; 
-	C_data = bg.C_data;
-    C_op = bg.C_op;
-    C_start = bg.C_start;
+	bidg.isopcode.constraint_mode($random);
+      assert(bidg.randomize());
+    X_bidAmt = bidg.X_bidAmt;
+    Y_bidAmt = bidg.Y_bidAmt;
+    Z_bidAmt = bidg.Z_bidAmt;
+    X_bid = bidg.X_bid;
+    Y_bid = bidg.Y_bid;
+    Z_bid = bidg.Z_bid;
+	X_retract = bidg.X_retract;
+    Y_retract = bidg.Y_retract;
+    Z_retract = bidg.Z_retract; 
+	C_data = bidg.C_data;
+    C_op = bidg.C_op;
+    C_start = bidg.C_start;
 	
-	bg.printbid();
+	bidg.printbid();
 
-    static bid_input_signals bis = new;
-    static bid_output_signals bos = new;
+
    //static state_check sc = new();
     
     // input coverage
@@ -223,6 +227,7 @@ initial begin
 	
 	BIDSIGX =  bis.bidsigX.get_coverage();
     BIDSIGY =  bis.bidsigY.get_coverage();
+      $display("BIDSIGXXXXX: %d", BIDSIGX);
     BIDSIGZ =  bis.bidsigZ.get_coverage();
     RETRACTSIGX =  bis.retractsigX.get_coverage();
     RETRACTSIGY =  bis.retractsigY.get_coverage();
@@ -257,10 +262,9 @@ initial begin
     WINY =  bos.winY.get_coverage();
     WINZ =  bos.winZ.get_coverage();
     // state coverage
-    sc.sample(State);
-    STATE = sc.b1.State.get_coverage();
-    end
-    while (1);
+   /* sc.sample(State);
+    STATE = sc.b1.State.get_coverage();*/
+    end while (1);
     /*while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
         STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
         BALANCEY, BALANCEZ, BIDMAX, WINX, WINY, WINZ, STATE;)*/
