@@ -30,8 +30,8 @@ opt:
 
 report:
 		
-		vsim -cvgperinstance -c <ARGUMENTS> work.tb_top work.glbl -do " coverage save -onexit funcov.ucdb
-		 
+		vsim -coverage -vopt  work.top -c -do "coverage save -onexit -directive -cvg -codeall func_cov; run -all"
+		vcover report -verbose func_cov > report_func_cov.txt
 build: all 
 
 .PHONY: all clean setup compile opt report info
