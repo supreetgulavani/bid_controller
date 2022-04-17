@@ -1,8 +1,4 @@
-// Code your testbench here
-// or browse Examples
-//import package rnippkg::*;
-   
-// random input
+// Class for random input
 class bids_gen;
 	rand bit [15:0] X_bidAmt, Y_bidAmt, Z_bidAmt;
 	rand bit 		X_bid, Y_bid, Z_bid;
@@ -13,26 +9,8 @@ class bids_gen;
 
 	// constraints
 	constraint isopcode{
-		//C_op >= 0;
-		//C_op <= 8;
 		C_op inside {[0:8]};
 	};
-    /*
-	// accept components
-	function bid_ip ();
-		this.X_bidAmt = X_bidAmt;
-		this.Y_bidAmt = Y_bidAmt;
-		this.Z_bidAmt = Z_bidAmt;
-		this.X_bid = X_bid;
-		this.Y_bid = Y_bid;
-		this.Z_bid = Z_bid;
-		this.X_retract = X_retract;
-		this.Y_retract = Y_retract;
-		this.Z_retract = Z_retract;
-		this.C_data = C_data;
-		this.C_start = C_start;
-	endfunction : bid_ip
-	*/
     
 	//prints all the inputs
 	function void printbid();
@@ -47,6 +25,12 @@ endclass
 module top ();
 
 parameter CLK_PERIOD = 10;
+parameter Reset_mode = 0;
+parameter Unlocked_mode = 1;
+parameter Locked_mode = 2;
+parameter RoundActive_mode = 3;
+parameter RoundOver_mode = 4;
+parameter Timer_mode = 5;
 
 logic         clk, reset_n, X_bid, X_retract, Y_bid, Y_retract, Z_bid, Z_retract, C_start;
 logic [15:0]  X_bidAmt, Y_bidAmt, Z_bidAmt;
@@ -57,20 +41,6 @@ logic [1:0]  X_err, Y_err, Z_err;
 logic [31:0] X_balance, Y_balance, Z_balance, maxBid;
 logic [2:0]  err;
 
-/*
-// internal registers
-logic [31:0] X_value;
-logic [31:0] Y_value;
-logic [31:0] Z_value;
-logic [3:0] timer;
-logic [31:0] key;
-logic [2:0] mask;
-logic [31:0] bid_cost;
-
-logic [3:0] counter;
-logic [31:0] local_key;
-*/
-
 real    BIDSIGX, BIDSIGY, BIDSIGZ, RETRACTSIGX, RETRACTSIGY, RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
         STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
         BALANCEY, BALANCEZ, BIDMAX, WINX, WINY, WINZ, STATE;
@@ -80,12 +50,6 @@ always begin: clock_generator
  	#(CLK_PERIOD / 2) clk = ~clk;
 end: clock_generator
 
-// reset gen
-initial begin
-	reset_n = 0;
-	#5;
-	reset_n = 1;
-end
 
 BIDS22model b1(.*);
 
@@ -168,10 +132,10 @@ covergroup bid_output_signals with function sample(bit X_ack, Y_ack, Z_ack, X_wi
     winY : coverpoint Y_win;
     winZ : coverpoint Z_win;
 endgroup
-/*
+
 covergroup state_check @(posedge clk);
     option.at_least = 1;
-    coverpoint b1.State {
+    fsm_cov : coverpoint b1.State {
         bins s0 = (Reset_mode => Unlocked_mode);
         bins s1 = (Unlocked_mode => Locked_mode);
         bins s2 = (Locked_mode => RoundActive_mode);
@@ -191,18 +155,24 @@ covergroup state_check @(posedge clk);
     }
 endgroup
 
-state_check sc = new;
-*/
+
 // random inputs generation and get_coverage
 bids_gen bidg = new;
-      bid_input_signals bis = new;
-    bid_output_signals bos = new;
+bid_input_signals bis = new;
+bid_output_signals bos = new;
+state_check sc = new;
+
 initial begin
-	$display("Start generating testcases\n");
-  	
+  	reset_n = 0;
+	#5;
+	reset_n = 1;
+	
     do begin
-	bidg.isopcode.constraint_mode($random);
-      assert(bidg.randomize());
+	@(posedge clk);
+	
+	bidg.isopcode.constraint_mode(1);
+    assert(bidg.randomize());
+	
     X_bidAmt = bidg.X_bidAmt;
     Y_bidAmt = bidg.Y_bidAmt;
     Z_bidAmt = bidg.Z_bidAmt;
@@ -217,9 +187,6 @@ initial begin
     C_start = bidg.C_start;
 	
 	bidg.printbid();
-
-
-   //static state_check sc = new();
     
     // input coverage
     bis.sample(X_bid , Y_bid, Z_bid, X_retract, Y_retract, Z_retract, C_start, X_bidAmt, Y_bidAmt, Z_bidAmt, C_data, C_op);
@@ -227,7 +194,6 @@ initial begin
 	
 	BIDSIGX =  bis.bidsigX.get_coverage();
     BIDSIGY =  bis.bidsigY.get_coverage();
-      $display("BIDSIGXXXXX: %d", BIDSIGX);
     BIDSIGZ =  bis.bidsigZ.get_coverage();
     RETRACTSIGX =  bis.retractsigX.get_coverage();
     RETRACTSIGY =  bis.retractsigY.get_coverage();
@@ -244,7 +210,6 @@ initial begin
     STARTCXBIDSIGXYZ = bis.startCxbidsigXYZ.get_coverage();
 
     // output coverage
-    
     ACKSIGX = bos.acksigX.get_coverage();
     ACKSIGY = bos.acksigY.get_coverage();
     ACKSIGZ = bos.acksigZ.get_coverage();
@@ -261,47 +226,18 @@ initial begin
     WINX =  bos.winX.get_coverage();
     WINY =  bos.winY.get_coverage();
     WINZ =  bos.winZ.get_coverage();
+	
     // state coverage
-   /* sc.sample(State);
-    STATE = sc.b1.State.get_coverage();*/
-    end while (1);
-    /*while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
-        STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
-        BALANCEY, BALANCEZ, BIDMAX, WINX, WINY, WINZ, STATE;)*/
+    STATE = sc.fsm_cov.get_coverage();
+	
+    end //while (1);
+    while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || (RETRACTSIGZ < 100.0) || 
+	    (BID_AMOUNTX < 100.0) || (BID_AMOUNTY < 100.0) || (BID_AMOUNTZ < 100.0) || (OPCODEC < 100.0) || (DATAC < 1.0) || (STARTC < 100.0) || (STARTCXBIDSIGX < 100.0) ||
+        (STARTCXBIDSIGY  < 100.0) || (STARTCXBIDSIGZ < 100.0) || (STARTCXBIDSIGXYZ < 100.0) || (ACKSIGX < 100.0) || (ACKSIGY < 100.0) || (ACKSIGZ < 100.0) || 
+		(READYSIG < 100.0) || (ROUNDOVERSIG < 100.0) || (ERRX < 100.0) || (ERRY < 100.0) || (ERRZ < 100.0) || (ERRSIG < 100.0) || (WINX < 100.0) || (WINY < 100.0) ||
+		(WINZ < 100.0) || (STATE < 50.0));
+		//BALANCEX, BALANCEY, BALANCEZ, BIDMAX
 
 end
 
-
-/*
-inital begin
-    repeat (1) @(negedge clk);
-    C_op = 3;
-    C_data = 20;
-    repeat (1) @(negedge clk);
-    C_op = 4;
-    C_data = 15;
-    repeat (1) @(negedge clk);
-    C_op = 5;
-    C_data = 5;
-    repeat (1) @(negedge clk);
-    C_op = 8;
-    C_data = 1;
-    repeat (1) @(negedge clk);
-    C_op = 2;
-    C_data = 42;
-    repeat (1) @(negedge clk);
-    C_start = 1;
-    repeat (1) @(negedge clk);
-    X_bid = 1;
-    X_bidAmt = 5;
-    repeat (1) @(negedge clk);
-    Y_bid = 1;
-    Y_bidAmt = 2;
-    repeat (1) @(negedge clk);
-    Z_bid = 1;
-    Z_bidAmt = 2;
-    repeat (1) @(negedge clk);
-    C_start = 0;
-end
-*/
 endmodule
