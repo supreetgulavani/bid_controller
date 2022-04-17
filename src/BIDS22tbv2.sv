@@ -41,6 +41,8 @@ logic [1:0]  X_err, Y_err, Z_err;
 logic [31:0] X_balance, Y_balance, Z_balance, maxBid;
 logic [2:0]  err;
 
+int i = 100;
+
 real    BIDSIGX, BIDSIGY, BIDSIGZ, RETRACTSIGX, RETRACTSIGY, RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
         STARTCXBIDSIGY, STARTCXBIDSIGZ, STARTCXBIDSIGXYZ, ACKSIGX, ACKSIGY, ACKSIGZ, READYSIG, ROUNDOVERSIG, ERRX, ERRY, ERRZ, ERRSIG, BALANCEX, 
         BALANCEY, BALANCEZ, BIDMAX, WINX, WINY, WINZ, STATE;
@@ -230,12 +232,14 @@ initial begin
     // state coverage
     STATE = sc.fsm_cov.get_coverage();
 	
-    end //while (1);
-    while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || (RETRACTSIGZ < 100.0) || 
+	i = i - 1;
+	
+    end while (i == 0);
+    /*while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || (RETRACTSIGZ < 100.0) || 
 	    (BID_AMOUNTX < 100.0) || (BID_AMOUNTY < 100.0) || (BID_AMOUNTZ < 100.0) || (OPCODEC < 100.0) || (DATAC < 1.0) || (STARTC < 100.0) || (STARTCXBIDSIGX < 100.0) ||
         (STARTCXBIDSIGY  < 100.0) || (STARTCXBIDSIGZ < 100.0) || (STARTCXBIDSIGXYZ < 100.0) || (ACKSIGX < 100.0) || (ACKSIGY < 100.0) || (ACKSIGZ < 100.0) || 
 		(READYSIG < 100.0) || (ROUNDOVERSIG < 100.0) || (ERRX < 100.0) || (ERRY < 100.0) || (ERRZ < 100.0) || (ERRSIG < 100.0) || (WINX < 100.0) || (WINY < 100.0) ||
-		(WINZ < 100.0) || (STATE < 50.0));
+		(WINZ < 100.0) || (STATE < 50.0));*/
 		//BALANCEX, BALANCEY, BALANCEZ, BIDMAX
 
 end
