@@ -28,9 +28,11 @@ compile:
 opt:
 		vopt top -o top_optimized +acc "+cover=sbfec+bidder(rtl)."
 
-report:
+release:
 		
 		vsim -coverage -vopt  work.top -c -do "coverage save -onexit -directive -cvg -codeall func_cov; run -all"
+
+report:
 		vcover report -verbose func_cov > report_func_cov.txt
 build: all 
 
