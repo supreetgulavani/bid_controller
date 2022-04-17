@@ -83,9 +83,9 @@ covergroup bid_input_signals with function sample(bit X_bid , Y_bid, Z_bid, X_re
         bins C0 = { [0:8] };
     }
     dataC : coverpoint C_data{
-        bins dC0 = { [0:8] };
-        bins dC1 = { [9:4294967292] };
-        bins dC2 = { [4294967293:4294967295] };
+        //bins dC0 = { [0:8] };
+        //bins dC1 = { [9:4294967292] };
+        //bins dC2 = { [4294967293:4294967295] };
     }
     startC : coverpoint C_start;
     startCxbidsigX : cross startC, bidsigX;
@@ -109,24 +109,24 @@ covergroup bid_output_signals with function sample(bit X_ack, Y_ack, Z_ack, X_wi
         bins err0 = { [0:5] };
     }
     balanceX : coverpoint X_balance {
-        bins balanceX0 = { [0:8] };
-        bins balanceX1 = { [9:4294967292] };
-        bins balanceX2 = { [4294967293:4294967295] };
+        //bins balanceX0 = { [0:8] };
+        //bins balanceX1 = { [9:4294967292] };
+        //bins balanceX2 = { [4294967293:4294967295] };
     }
     balanceY : coverpoint Y_balance {
-        bins balanceY0 = { [0:8] };
-        bins balanceY1 = { [9:4294967292] };
-        bins balanceY2 = { [4294967293:4294967295] };
+        //bins balanceY0 = { [0:8] };
+        //bins balanceY1 = { [9:4294967292] };
+        //bins balanceY2 = { [4294967293:4294967295] };
     }
     balanceZ : coverpoint Z_balance {
-        bins balanceZ0 = { [0:8] };
-        bins balanceZ1 = { [9:4294967292] };
-        bins balanceZ2 = { [4294967293:4294967295] };
+        //bins balanceZ0 = { [0:8] };
+        //bins balanceZ1 = { [9:4294967292] };
+        //bins balanceZ2 = { [4294967293:4294967295] };
     }
     bidmax : coverpoint maxBid {
-        bins bidmax0 = { [0:8] };
-        bins bidmax1 = { [9:4294967292] };
-        bins bidmax2 = { [4294967293:4294967295] };
+        //bins bidmax0 = { [0:8] };
+        //bins bidmax1 = { [9:4294967292] };
+        //bins bidmax2 = { [4294967293:4294967295] };
     }
     winX : coverpoint X_win;
     winY : coverpoint Y_win;
