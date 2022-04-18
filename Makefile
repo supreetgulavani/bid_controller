@@ -10,7 +10,7 @@ TARGET		:= bid_controller
 
 # Directories for source files and builds
 SRC_DIR 	:= src
-BUILD_DIR 	:= work transcript *~ vsim.wlf *.log dgs.dbg dmslogdir
+BUILD_DIR 	:= work transcript *~ vsim.wlf *.log dgs.dbg dmslogdir covhtmlreport
 
 # sources 
 SRCS	:= $(wildcard $(SRC_DIR)/*.sv)
@@ -23,22 +23,23 @@ setup:
 		vmap work work
 
 compile:
-		vlog $(SRCS)
+		vlog -coveropt 3 +cover=sbfec +acc $(SRCS)
 
-opt:
-		vopt top -o top_optimized +acc "+cover=sbfec+bidder(rtl)."
+#opt:
+		#vopt top -o top_optimized +acc
 
 release:
 		
-		vsim -coverage -vopt  work.top -c -do "coverage save -onexit -directive -cvg -codeall func_cov; run -all"
+		vsim -coverage -vopt work.top -c -do "coverage save -onexit -directive -cvg -codeAll func_cov; run -all"
 
 report:
 		vcover report -verbose func_cov > report_func_cov.txt
+html:
 		vcover report -html func_cov
 
 build: all 
 
-.PHONY: all clean setup compile opt report info
+.PHONY: all clean setup compile opt release report html info
 
 .DEFAULT_GOAL	:= build
 
