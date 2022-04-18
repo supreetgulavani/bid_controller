@@ -34,6 +34,8 @@ release:
 
 report:
 		vcover report -verbose func_cov > report_func_cov.txt
+		vcover report -html func_cov
+
 build: all 
 
 .PHONY: all clean setup compile opt report info
