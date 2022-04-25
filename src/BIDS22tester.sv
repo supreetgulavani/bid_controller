@@ -18,11 +18,11 @@ function operation_t get_op();
 	4'b0111 : return SetTimer_op;
 	4'b1000 : return BidCharge_op;
 	4'b1001 : return RoundActive_op;
-	4'b1010 : return RoundOver_op;
-	4'b1011 : return RoundActive_op;
+	4'b1010 : return Unlock_op;
+	4'b1011 : return Unlock_op;
 	4'b1100 : return Unlock_op;
-    4'b1101 : return RoundActive_op;
-	4'b1110 : return NoOperation_op;
+    4'b1101 : return Unlock_op;
+	4'b1110 : return Unlock_op;
 	4'b1111 : return Unlock_op;
   endcase
 endfunction: get_op
@@ -55,16 +55,16 @@ endfunction: get_bidAmt
 
 //function to get stimulus for C_start, X_bid, Y_bid, Z_bid, and retract Control signals
 function bit get_cSignal();
-	bit [1:0] max_min;
-	max_min = $random;
-	if (max_min == 2'b00)
-		return 1'b1;
-	else if (max_min == 2'b11)
-		return 1'b1;
-	else if (max_min == 2'b10)
-		return 1'b1;
-	else	
-	return 1'b0;
+  bit [1:0] max_min;
+  max_min = $random;
+  if(max_min == 2'b00)
+    return 1'b1;
+  else if(max_min == 2'b11)
+    return 1'b1;
+  else if(max_min == 2'b10)
+    return 1'b1;
+  else
+    return 1'b0;
 endfunction: get_cSignal
 
 initial begin
@@ -83,11 +83,14 @@ initial begin
   bit troundOver;
   bit [31:0] tmaxBid;
   
-  //dynamic selection of a task to set initial conditions
+  /*//dynamic selection of a task to set initial conditions
+  if($value$plusargs("RUNS=%d", runs));
   bfm.reset_BIDmodel();
-  //bfm.unlock_BIDmodel();
+  //bfm.unlock_BIDmodel();*/
+  //dynamic selection of a number of runs
+  if($value$plusargs("RUNS=%d", runs));
   
-  repeat (100) begin: random_loop
+  repeat (runs) begin: random_loop
     op_set = get_op();
 	tCdata = get_Cdata();
     tXbidAmt = get_bidAmt();
