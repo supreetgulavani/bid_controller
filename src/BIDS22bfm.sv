@@ -75,12 +75,32 @@ task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt,
     C_data = localKey;
 	C_start = 0;
 	C_op = tOp; //Unlock
+        X_bid = tXbid;
+        Y_bid = tYbid;
+        Z_bid = tZbid;
+        X_retract = tXretract;
+        Y_retract = tYretract;
+        Z_retract = tZretract;
+        X_bidAmt = tXbidAmt;
+        Y_bidAmt = tYbidAmt;
+        Z_bidAmt = tZbidAmt;
+        $display("Runs firstif else");
   end
   else if(tOp == Lock_op) begin        //Lock-operation initial conditions
     @(negedge clk);
 	C_data = tCdata;
 	localKey = tCdata;
 	C_op = tOp; //Lock
+        X_bid = tXbid;
+        Y_bid = tYbid;
+        Z_bid = tZbid;
+        X_retract = tXretract;
+        Y_retract = tYretract;
+        Z_retract = tZretract;
+        X_bidAmt = tXbidAmt;
+        Y_bidAmt = tYbidAmt;
+        Z_bidAmt = tZbidAmt;
+        $display("Runs fourthlast else");
   end
   else if(tOp == RoundActive_op) begin //RoundActive-operation initial conditions
     @(negedge clk);
@@ -110,12 +130,32 @@ task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt,
 	while(roundOver == 0);
 	C_start = tCstart;
 	C_op = tOp;
+        X_bid = tXbid;
+        Y_bid = tYbid;
+        Z_bid = tZbid;
+        X_retract = tXretract;
+        Y_retract = tYretract;
+        Z_retract = tZretract;
+        X_bidAmt = tXbidAmt;
+        Y_bidAmt = tYbidAmt;
+        Z_bidAmt = tZbidAmt;
+        $display("Runs secondlast else");
   end
   else begin                          //Other operations initial conditions
     @(negedge clk);
     C_op = tOp;
 	C_start = 0;
 	C_data = tCdata;
+	X_bid = tXbid;
+	Y_bid = tYbid;
+	Z_bid = tZbid;
+	X_retract = tXretract;
+        Y_retract = tYretract;
+        Z_retract = tZretract;
+	X_bidAmt = tXbidAmt;
+        Y_bidAmt = tYbidAmt;
+        Z_bidAmt = tZbidAmt;
+	$display("Runs last else");
   end
   
 endtask: send_op
