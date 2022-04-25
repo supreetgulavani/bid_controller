@@ -51,12 +51,12 @@ function bit [15:0] get_bidAmt();
     return 16'hFFFF;
   else
     return $random;
-endfunction: get_Cdata
+endfunction: get_bidAmt
 
 //function to get stimulus for C_start, X_bid, Y_bid, Z_bid, and retract Control signals
 function bit get_cSignal();
   return $random;
-endfunction: get_Cdata
+endfunction: get_cSignal
 
 initial begin
   bit [31:0] tCdata;
@@ -65,7 +65,7 @@ initial begin
   bit tXretract, tYretract, tZretract; 
   bit tCstart; 
   operation_t op_set;
-  bit tXack, tYack, tZack,
+  bit tXack, tYack, tZack;
   bit [1:0] tXerr, tYerr, tZerr;
   bit [31:0] tXbalance, tYbalance, tZbalance;
   bit tXwin, tYwin, tZwin;
@@ -76,7 +76,7 @@ initial begin
   
   //dynamic selection of a task to set initial conditions
   bfm.reset_BIDmodel();
-  bfm.unlock_BIDmodel();
+  //bfm.unlock_BIDmodel();
   
   repeat (1000) begin: random_loop
     op_set = get_op();
@@ -84,7 +84,7 @@ initial begin
     tXbidAmt = get_bidAmt();
 	tYbidAmt = get_bidAmt();
 	tZbidAmt = get_bidAmt();
-    Xbid = get_cSignal();
+    tXbid = get_cSignal();
 	tYbid = get_cSignal();
 	tZbid = get_cSignal();
     tXretract = get_cSignal();
@@ -102,4 +102,4 @@ initial begin
   
 end
 
-endmodule: tester
+endmodule: BIDS22tester

@@ -38,7 +38,7 @@ task reset_BIDmodel();
   reset_n = 1'b0;
   @(negedge clk);
   @(negedge clk);
-  reset_n - 1'b1;
+  reset_n = 1'b1;
   localKey = 0;
 endtask: reset_BIDmodel
 
@@ -47,26 +47,26 @@ task unlock_BIDmodel();
   reset_n = 1'b0;
   @(negedge clk);
   @(negedge clk);
-  reset_n - 1'b1;
+  reset_n = 1'b1;
   localKey = 0;
   C_op = 4'b0000; //Unlock
-endtask: reset_BIDmodel
+endtask: unlock_BIDmodel
 
 /*task for operations defined in operation_t 
   --> sets conditions and data for each operation*/
-task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt;
-  input bit tXbid, tYbid, tZbid;
-  input bit tXretract, tYretract, tZretract; 
-  input bit [31:0] tCdata;
-  input bit tCstart;
+task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt,
+  input bit tXbid, tYbid, tZbid,
+  input bit tXretract, tYretract, tZretract,
+  input bit [31:0] tCdata,
+  input bit tCstart,
   input operation_t tOp,
   output bit tXack, tYack, tZack,
-  output bit [1:0] tXerr, tYerr, tZerr;
-  output bit [31:0] tXbalance, tYbalance, tZbalance;
-  output bit tXwin, tYwin, tZwin;
-  output bit tready;
-  output bit [2:0] terr;
-  output bit troundOver;
+  output bit [1:0] tXerr, tYerr, tZerr,
+  output bit [31:0] tXbalance, tYbalance, tZbalance,
+  output bit tXwin, tYwin, tZwin,
+  output bit tready,
+  output bit [2:0] terr,
+  output bit troundOver,
   output bit [31:0] tmaxBid);
 
 
@@ -120,4 +120,4 @@ task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt;
   
 endtask: send_op
 
-
+endinterface: BIDS22bfm
