@@ -1,27 +1,3 @@
-// Class for random input
-class bids_gen;
-	rand bit [15:0] X_bidAmt, Y_bidAmt, Z_bidAmt;
-	rand bit 		X_bid, Y_bid, Z_bid;
-	rand bit		X_retract, Y_retract, Z_retract; 
-	rand bit [31:0] C_data;
-	rand bit [3:0] 	C_op;
-	rand bit 		C_start;
-
-	// constraints
-	constraint isopcode{
-		C_op inside {[0:8]};
-	};
-    
-	//prints all the inputs
-	function void printbid();
-		$display("X_bidAmt:%b\tY_bidAmt:%b\tZ_bidAmt:%b", X_bidAmt, Y_bidAmt, Z_bidAmt); 
-		$display("X_bid:%b\tY_bid:%b\tZ_bid:%b", X_bid, Y_bid, Z_bid); 
-		$display("X_retract:%b\tY_retract:%b\tZ_retract:%b", X_retract, Y_retract, Z_retract); 
-		$display("C_data:%b\tC_start:%b", C_data, C_start); 
-	endfunction
-
-endclass
-   
 module top ();
 
 parameter CLK_PERIOD = 10;
@@ -41,6 +17,7 @@ logic [1:0]  X_err, Y_err, Z_err;
 logic [31:0] X_balance, Y_balance, Z_balance, maxBid;
 logic [2:0]  err;
 
+bit start;
 
 
 real    BIDSIGX, BIDSIGY, BIDSIGZ, RETRACTSIGX, RETRACTSIGY, RETRACTSIGZ, BID_AMOUNTX, BID_AMOUNTY, BID_AMOUNTZ, OPCODEC, DATAC, STARTC, STARTCXBIDSIGX,
@@ -164,32 +141,10 @@ bid_input_signals bis = new;
 bid_output_signals bos = new;
 state_check sc = new;
 
-initial begin
-  	reset_n = 0;
-	#5;
-	reset_n = 1;
-	
-    do begin
-	//@(posedge clk);
-	
-	bidg.isopcode.constraint_mode(1);
-    assert(bidg.randomize());
-	
-    X_bidAmt = bidg.X_bidAmt;
-    Y_bidAmt = bidg.Y_bidAmt;
-    Z_bidAmt = bidg.Z_bidAmt;
-    X_bid = bidg.X_bid;
-    Y_bid = bidg.Y_bid;
-    Z_bid = bidg.Z_bid;
-	X_retract = bidg.X_retract;
-    Y_retract = bidg.Y_retract;
-    Z_retract = bidg.Z_retract; 
-	C_data = bidg.C_data;
-    C_op = bidg.C_op;
-    C_start = bidg.C_start;
-	
-	bidg.printbid();
-    
+
+
+// gets coverage 
+task gen_coverage();
     // input coverage
     bis.sample(X_bid , Y_bid, Z_bid, X_retract, Y_retract, Z_retract, C_start, X_bidAmt, Y_bidAmt, Z_bidAmt, C_data, C_op);
     bos.sample(X_ack, Y_ack, Z_ack, X_win, Y_win, Z_win, ready, roundOver, X_err, Y_err, Z_err, X_balance, Y_balance, Z_balance, maxBid, err);
@@ -233,13 +188,40 @@ initial begin
     STATE = sc.fsm_cov.get_coverage();
 	
 	
-    end  while (1);
+    while (1);
   /*while ((BIDSIGX < 100.0) || (BIDSIGY < 100.0) || (BIDSIGZ < 100.0) || (RETRACTSIGX < 100.0) || (RETRACTSIGY < 100.0) || (RETRACTSIGZ < 100.0) || 
 	    (BID_AMOUNTX < 100.0) || (BID_AMOUNTY < 100.0) || (BID_AMOUNTZ < 100.0) || (OPCODEC < 100.0) || (STARTC < 100.0) || (STARTCXBIDSIGX < 100.0) ||
         (STARTCXBIDSIGY  < 100.0) || (STARTCXBIDSIGZ < 100.0) || (STARTCXBIDSIGXYZ < 100.0) || (ACKSIGX < 100.0) || (ACKSIGY < 100.0) || (ACKSIGZ < 100.0) || 
 		(READYSIG < 100.0) || (ROUNDOVERSIG < 100.0) || (ERRX < 100.0) || (ERRY < 100.0) || (ERRZ < 100.0) || (ERRSIG < 100.0) || (WINX < 100.0) || (WINY < 100.0) ||
 		(WINZ < 100.0) || (STATE < 50.0));*/
 		//BALANCEX, BALANCEY, BALANCEZ, BIDMAX
+        
+endtask : gen_coverage
+
+
+initial begin
+	
+	if($test$plusargs("correctopcode")) bidg.isopcode.constraint_mode(1);
+   // assert(bidg.randomize());
+	
+    X_bidAmt = bidg.X_bidAmt;
+    Y_bidAmt = bidg.Y_bidAmt;
+    Z_bidAmt = bidg.Z_bidAmt;
+    X_bid = bidg.X_bid;
+    Y_bid = bidg.Y_bid;
+    Z_bid = bidg.Z_bid;
+	X_retract = bidg.X_retract;     
+    Y_retract = bidg.Y_retract;
+    Z_retract = bidg.Z_retract; 
+	C_data = bidg.C_data;
+    C_op = bidg.C_op;
+    C_start = bidg.C_start;
+	
+	bidg.printbid();
+    
+
+    if($test$plusargs("getcoverage")) gen_coverage();
+
 
 end
 
