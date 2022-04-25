@@ -83,12 +83,23 @@ initial begin
   bit troundOver;
   bit [31:0] tmaxBid;
   
-  /*//dynamic selection of a task to set initial conditions
-  if($value$plusargs("RUNS=%d", runs));
-  bfm.reset_BIDmodel();
-  //bfm.unlock_BIDmodel();*/
+  int runs;
+  string Initial_Task;
+  
+  //dynamic selection of a task to set initial conditions
+  if($value$plusargs("InitialTask=%s", Initial_Task));
+  if(Initial_Task == "ResetTask")
+    bfm.reset_BIDmodel();
+  else if(Initial_Task == "UnlockTask")
+    bfm.unlock_BIDmodel();
+  else
+    $display("No initial task given");
+
   //dynamic selection of a number of runs
   if($value$plusargs("RUNS=%d", runs));
+  
+  $display("RUNS: %d", runs);
+  $display("InitialTask: %s", Initial_Task);
   
   repeat (runs) begin: random_loop
     op_set = get_op();
