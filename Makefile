@@ -23,7 +23,7 @@ setup:
 		vmap work work
 
 compile:
-		vlog -coveropt 3 +cover=sbfec +acc $(SRCS)
+		vlog -coveropt 3 +cover=sbfec +acc src/BIDS22pkg.sv $(SRCS)
 
 #opt:
 		#vopt top -o top_optimized +acc
