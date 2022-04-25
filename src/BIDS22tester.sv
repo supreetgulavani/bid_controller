@@ -55,7 +55,16 @@ endfunction: get_bidAmt
 
 //function to get stimulus for C_start, X_bid, Y_bid, Z_bid, and retract Control signals
 function bit get_cSignal();
-  return $random;
+	bit [1:0] max_min;
+	max_min = $random;
+	if (max_min == 2'b00)
+		return 1'b1;
+	else if (max_min == 2'b11)
+		return 1'b1;
+	else if (max_min == 2'b10)
+		return 1'b1;
+	else	
+	return 1'b0;
 endfunction: get_cSignal
 
 initial begin
