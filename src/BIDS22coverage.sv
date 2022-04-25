@@ -20,24 +20,29 @@ covergroup bid_input_signals;
     retractsigY : coverpoint Y_retract;
     retractsigZ : coverpoint Z_retract;
     bid_amountX : coverpoint X_bidAmt {
+	    option.at_least = 1;
         bins X0 = {'h0000};
         bins X1 = {['h0001:'hFFFE]};
         bins X2 = {'hFFFF};
     } 
     bid_amountY : coverpoint Y_bidAmt {
+	    option.at_least = 1;
         bins Y0 = {'h0000};
         bins Y1 = {['h0001:'hFFFE]};
         bins Y2 = {'hFFFF};
     } 
     bid_amountZ : coverpoint Z_bidAmt{
+	    option.at_least = 1;
         bins Z0 = {'h0000};
         bins Z1 = {['h0001:'hFFFE]};
         bins Z2 = {'hFFFF};
     } 
     opcodeC : coverpoint C_op {
+	    option.at_least = 1;
         bins C0 = {[0:8]};
     }
     dataC : coverpoint C_data{
+	    option.at_least = 1;
         bins dC0 = {'h00000000};
         bins dC1 = {['h00000001:'hFFFFFFFE]};
         bins dC2 = {'hFFFFFFFF};
@@ -63,21 +68,25 @@ covergroup bid_output_signals;
         bins err0 = { [0:5] };
     }
     balanceX : coverpoint X_balance {
+	    option.at_least = 1;
         bins balanceX0 = {'h00000000};
         bins balanceX1 = {['h00000001:'hFFFFFFFE]};
         bins balanceX2 = {'hFFFFFFFF};
     }
     balanceY : coverpoint Y_balance {
+	    option.at_least = 1;
         bins balanceY0 = {'h00000000};
         bins balanceY1 = {['h00000001:'hFFFFFFFE]};
         bins balanceY2 = {'hFFFFFFFF};
     }
     balanceZ : coverpoint Z_balance {
+	    option.at_least = 1;
         bins balanceZ0 = {'h00000000};
         bins balanceZ1 = {['h00000001:'hFFFFFFFE]};
         bins balanceZ2 = {'hFFFFFFFF};
     }
     bidmax : coverpoint maxBid {
+	    option.at_least = 1;
         bins bidmax0 = {'h00000000};
         bins bidmax1 = {['h00000001:'hFFFFFFFE]};
         bins bidmax2 = {'hFFFFFFFF};
@@ -91,6 +100,7 @@ bid_input_signals input_signals;
 bid_output_signals output_signals;
 
 initial begin: coverage_block
+  
   input_signals = new();
   output_signals = new();
   

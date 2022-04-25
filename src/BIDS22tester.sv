@@ -2,7 +2,7 @@ module BIDS22tester(BIDS22bfm bfm);
 
 import BIDS22pkg::*;
 
-/*function to get stimulus for opcodes 
+/*function to get stimulus for operations defined the BIDS22pkg 
  --> static probability is used to select a value*/
 function operation_t get_op();
   bit [3:0] op_choice;
@@ -78,7 +78,7 @@ initial begin
   bfm.reset_BIDmodel();
   //bfm.unlock_BIDmodel();
   
-  repeat (1000) begin: random_loop
+  repeat (100) begin: random_loop
     op_set = get_op();
 	tCdata = get_Cdata();
     tXbidAmt = get_bidAmt();
