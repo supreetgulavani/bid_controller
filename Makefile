@@ -4,7 +4,7 @@
 #
 # Group 16: Supreet Gulavani, Sreeja Boyina
 ######################################################################
-#comment
+
 # Target
 TARGET		:= bid_controller
 
@@ -34,6 +34,7 @@ release:
 
 report:
 		vcover report -verbose func_cov > report_func_cov.txt
+
 html:
 		vcover report -html func_cov
 
