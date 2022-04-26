@@ -30,7 +30,7 @@ compile:
 
 release:
 		
-		vsim -coverage -vopt work.top -c -do "coverage save -onexit -directive -cvg -codeAll func_cov; run -all"
+		vsim -coverage -vopt work.top -c -do "coverage save -onexit -directive -cvg -codeAll func_cov; run -all" +RUNS=5000 +InitialTask="ResetTask"
 
 report:
 		vcover report -verbose func_cov > report_func_cov.txt
