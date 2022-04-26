@@ -139,7 +139,6 @@ task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt,
         X_bidAmt = tXbidAmt;
         Y_bidAmt = tYbidAmt;
         Z_bidAmt = tZbidAmt;
-        $display("Runs secondlast else");
   end
   else begin                          //Other operations initial conditions
     @(negedge clk);
@@ -155,7 +154,6 @@ task send_op(input bit [15:0] tXbidAmt, tYbidAmt, tZbidAmt,
 	X_bidAmt = tXbidAmt;
         Y_bidAmt = tYbidAmt;
         Z_bidAmt = tZbidAmt;
-	$display("Runs last else");
   end
   
 endtask: send_op
