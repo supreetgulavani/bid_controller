@@ -13,3 +13,9 @@
     `make opt`   : Optimizes the top module
     
     `make clean`   : rm -rf the builds
+ 
+    `make release` : Runs the design and generates coverage with dynamically constrained stimulus
+    
+    `make report`   : Creates a functional and code coverage report
+    
+     `make html`   : Creates a HTML version of the coverage generated for better readability
