@@ -8,7 +8,7 @@ function operation_t get_op();
   bit [3:0] op_choice;
   op_choice = $random;
   case (op_choice)
-    4'b0000 : return NoOperation_op;
+  4'b0000 : return NoOperation_op;
 	4'b0001 : return Unlock_op;
 	4'b0010 : return Lock_op;
 	4'b0011 : return LoadX_op;
@@ -21,7 +21,7 @@ function operation_t get_op();
 	4'b1010 : return Unlock_op;
 	4'b1011 : return Unlock_op;
 	4'b1100 : return Unlock_op;
-    4'b1101 : return Unlock_op;
+  4'b1101 : return Unlock_op;
 	4'b1110 : return Unlock_op;
 	4'b1111 : return Unlock_op;
   endcase
