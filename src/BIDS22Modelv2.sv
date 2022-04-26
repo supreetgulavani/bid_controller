@@ -337,9 +337,9 @@ unique case(State)
 		    temp_bidcharge[i] = temp_bidcharge[i] + bid_cost;
 		    temp_balance[i] = (temp_balance[i] - bidAmt[i]) - bid_cost;
 		    temp_totalbid[i] = bidAmt[i] + temp_totalbid[i];
-		   end
-		   else	temp_err[i] = 2'b01; // insufficient funds
-		  else
+		   	end else	temp_err[i] = 2'b01; // insufficient funds
+			end
+		else
 		    begin
 			$display("******Inside bid and !retract block - Mask set******");
 		    ack[i] = 1'b0;
